@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Test WebRTC</title>
+    <script>
+
+        // For compatibility
+        var peerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection ||
+                window.webkitRTCPeerConnection || window.msRTCPeerConnection;
+        var sessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription ||
+                window.webkitRTCSessionDescription || window.msRTCSessionDescription;
+
+        var peer, channel;
+
+        window.onload = function() { initConnexion() };
+
+        function initConnexion(){
+            peer = new peerConnection(null, { optional: [{RtpDataChannels: true}] });
+
+            channel = peer.createDataChannel('myChannel', { reliable: false });
+            channel.onopen = function(evt){
+                console.log("Channel opened");
+            };
+            channel.onmessage = function(evt){
+                var data = JSON.parse(evt.data);
+                console.log("Message received in " + ((new Date()).getMilliseconds() - data.startTime) + "ms")
+                contentReceived(data.text);
+            };
+            channel.onclose = function(evt){
+                console.log("Channel has been closed");
+            };
+            channel.onerror = function(err){
+                console.log("Error on channel : ", err);
+            };
+
+            peer.createOffer(function(desc){
+                console.log("Offer created");
+                peer.setLocalDescription(desc);
+                outputSdp(desc.sdp);
+            }, function(err){
+                console.log("Error at offer creation : " + err);
+            });
+        };
+
+        function outputSdp(sdp){
+            document.getElementById('output_sdp').value = sdp;
+        }
+
+        function sdpReceived(){
+            var remoteSdb = document.getElementById('input_sdp').value;
+
+            peer.setRemoteDescription(new sessionDescription({
+                type: 'answer',
+                sdp: remoteSdb
+            }))
+        };
+
+        function contentReceived(content){
+            document.getElementById('content').innerHTML = content;
+        };
+    </script>
+
+</head>
+<body>
+
+    1. Copy this output and go te the other window: <br />
+    <textarea id="output_sdp" autocomplete="off"></textarea>
+    <br /><br />
+    4. Paste copied sdp from other window: <br />
+    <textarea id="input_sdp" autocomplete="off"></textarea>
+    <br />
+    <button onclick="sdpReceived();" value="Continue">
+        Link
+    </button>
+
+    <br /><br /><br />
+    <span id="content"></span>
+
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Test WebRTC</title>
+    <script>
+
+        // For compatibility
+        var peerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection ||
+                window.webkitRTCPeerConnection || window.msRTCPeerConnection;
+        var sessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription ||
+                window.webkitRTCSessionDescription || window.msRTCSessionDescription;
+
+        var peer, channel;
+
+        function initConnexion(remoteSdp) {
+            peer = new peerConnection(null, { optional: [{RtpDataChannels: true}] });
+
+            peer.ondatachannel = function(evt){
+                console.log('Channel created');
+
+                channel = evt.channel;
+
+                channel.onopen = function(evt) {
+                    console.log("Channel opened");
+                };
+                channel.onclose = function(evt){
+                    console.log("Channel has been closed");
+                };
+                channel.onerror = function(err){
+                    console.log("Error on channel : ", err);
+                };
+            };
+
+            peer.setRemoteDescription(new sessionDescription({
+                type: 'offer',
+                sdp: remoteSdp
+            }));
+
+            peer.createAnswer(function(desc){
+                peer.setLocalDescription(desc);
+                console.log('createAnswer');
+                outputSdp(desc.sdp);
+            }, function(err){
+                console.log('error in createAnswer: ', err);
+            });
+        };
+
+        function sendText(text){
+            channel.send(JSON.stringify({
+                text: text,
+                startTime: (new Date()).getMilliseconds()
+            }));
+        };
+
+
+        function outputSdp(sdp){
+            document.getElementById('output_sdp').value = sdp;
+        }
+
+        function sdpReceived(){
+            var remoteSdp = document.getElementById('input_sdp').value;
+
+            initConnexion(remoteSdp);
+        };
+
+        function contentChange(){
+            var content = document.getElementById('content').value;
+
+            sendText(content);
+        };
+
+    </script>
+
+</head>
+<body>
+
+    2. Paste the ohter window output here: <br />
+    <textarea id="input_sdp" autocomplete="off"></textarea>
+    <br />
+    <button onclick="sdpReceived();" value="Continue">
+        Link
+    </button>
+
+    <br /><br />
+    3. Copy generated sdp: <br />
+    <textarea id="output_sdp" autocomplete="off"></textarea>
+
+    <br /><br /><br />
+    5. Enter text here, should appear in other window<br />
+    <input type="text" onkeyup="contentChange()" id="content" autocomplete="off"/>
+
+</body>
+</html>

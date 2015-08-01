@@ -35,14 +35,17 @@
             peer.setRemoteDescription(new sessionDescription({
                 type: 'offer',
                 sdp: remoteSdp
-            }));
-
-            peer.createAnswer(function(desc){
-                peer.setLocalDescription(desc);
-                console.log('createAnswer');
-                outputSdp(desc.sdp);
+            }), function(){
+                alert('okay')
+                peer.createAnswer(function(desc){
+                    peer.setLocalDescription(desc);
+                    console.log('createAnswer');
+                    outputSdp(desc.sdp);
+                }, function(err){
+                    console.log('error in createAnswer: ', err);
+                });
             }, function(err){
-                console.log('error in createAnswer: ', err);
+                console.log("Error setting remote description", err);
             });
         };
 

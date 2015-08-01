@@ -36,7 +36,6 @@
                 type: 'offer',
                 sdp: remoteSdp
             }), function(){
-                alert('okay')
                 peer.createAnswer(function(desc){
                     peer.setLocalDescription(desc);
                     console.log('createAnswer');
@@ -47,14 +46,14 @@
             }, function(err){
                 console.log("Error setting remote description", err);
             });
-        };
+        }
 
         function sendText(text){
             channel.send(JSON.stringify({
                 text: text,
                 startTime: (new Date()).getMilliseconds()
             }));
-        };
+        }
 
 
         function outputSdp(sdp){
@@ -65,13 +64,13 @@
             var remoteSdp = document.getElementById('input_sdp').value;
 
             initConnexion(remoteSdp);
-        };
+        }
 
         function contentChange(){
             var content = document.getElementById('content').value;
 
             sendText(content);
-        };
+        }
 
     </script>
 
@@ -92,6 +91,7 @@
     <br /><br /><br />
     5. Enter text here, should appear in other window<br />
     <input type="text" onkeyup="contentChange()" id="content" autocomplete="off"/>
+    <button onclick="contentChange()">Force send</button>
 
 </body>
 </html>

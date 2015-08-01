@@ -41,7 +41,7 @@
             }, function(err){
                 console.log("Error at offer creation : " + err);
             });
-        };
+        }
 
         function outputSdp(sdp){
             document.getElementById('output_sdp').value = sdp;
@@ -54,11 +54,11 @@
                 type: 'answer',
                 sdp: remoteSdb
             }));
-        };
+        }
 
         function contentReceived(content){
             document.getElementById('content').innerHTML = content;
-        };
+        }
     </script>
 
 </head>

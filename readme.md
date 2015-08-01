@@ -1,4 +1,4 @@
-It allow to windows to communicate some text to simply demonstrate how WebRTC can work.
+It allows two windows to communicate some text to simply demonstrate how WebRTC can work.
 
 To test it :
 - open initiator.html
